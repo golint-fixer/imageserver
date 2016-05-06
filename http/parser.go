@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	//"log"
 
 	"github.com/pierrre/imageserver"
 )
@@ -65,6 +66,25 @@ func (parser *SourceParser) Resolve(param string) string {
 	}
 	return ""
 }
+
+
+// =========================== Copy Parser ===================
+// Copy Query string into 'Params'
+type CopyParser struct{}
+
+func (parser *CopyParser) Parse(req *http.Request, params imageserver.Params) error {
+	params.Set(imageserver.QueryKey, req.URL.String())
+	//log.Println("URL is:" + req.URL.String())
+	return nil
+}
+
+func (parser *CopyParser) Resolve(param string) string {
+	if param == imageserver.QueryKey {
+		return imageserver.QueryKey
+	}
+	return ""
+}
+
 
 // SourcePathParser is a Parser implementation that takes the "source" param from the HTTP URL path.
 type SourcePathParser struct{}

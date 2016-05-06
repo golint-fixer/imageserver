@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sort"
 	"sync"
+
+	//"url"
 )
 
 // Params are params used in imageserver.
@@ -28,6 +30,21 @@ func (params Params) Get(key string) (interface{}, error) {
 	}
 	return v, nil
 }
+
+/*
+// GetURL returns the url.URL value for the key.
+func (params Params) GetURL(key string) (url.URL, error) {
+	v, err := params.Get(key)
+	if err != nil {
+		return "", err
+	}
+	vt, ok := v.(url.URL)
+	if !ok {
+		return vt, newErrorType(key, v, "url.URL")
+	}
+	return vt, nil
+}
+*/
 
 // GetString returns the string value for the key.
 func (params Params) GetString(key string) (string, error) {

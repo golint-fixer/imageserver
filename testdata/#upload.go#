@@ -1,0 +1,79 @@
+package main
+
+import (
+	fs "github.com/weedfs"
+	"bufio"
+	"os"
+	"log"
+	//"io/ioutil"
+	"encoding/json"
+	//"github.com/boltdb/bolt"
+	"net/http"
+	"bytes"
+)
+
+type ImgInfo struct {
+	name     string
+	format   string
+}
+
+type MetaData struct {
+	FileType string
+	FileID   string
+}
+
+var (
+	imgList = []ImgInfo{
+		ImgInfo{"small.jpg", "jpeg"},
+		ImgInfo{"medium.jpg", "jpeg"},
+		ImgInfo{"large.jpg", "jpeg"},
+		ImgInfo{"huge.jpg", "jpeg"},
+ls		ImgInfo{"animated.gif", "gif"},
+		ImgInfo{"spaceship.gif", "gif"},
+		ImgInfo{"dalai_gamma.jpg", "jpeg"},
+		ImgInfo{"gray_squares.jpg", "jpeg"},
+		ImgInfo{"rings.png", "png"},
+		ImgInfo{"random.png", "png"},
+		ImgInfo{"invalid.png", "png"},
+	}
+	
+	dbURLKey = "http://localhost:9988/v1/buckets/meta/keys/"
+	
+	clientFS = fs.NewClient("localhost:9333")
+	clientDB = &http.Client{}
+)
+
+func main() {
+	for i, imgInfo := range imgList {
+		log.Printf("Upload the %dth Image\n", i)
+		upload(imgInfo)
+	}
+}
+
+func upload(imgInfo ImgInfo) {
+	imgPath := imgInfo.name
+	imgType := "image/" + imgInfo.format
+
+	f, err := os.Open(imgPath)
+	reader := bufio.NewReader(f)
+	
+	// upload image
+	fileID, err := clientFS.Upload(imgPath, imgType, reader)
+	log.Println("Upload fileID: " + fileID)
+	log.Println(err)
+
+	// metadata of image
+	metaData := &MetaData{FileType: imgType, FileID: fileID}
+	strMetaData, err := json.Marshal(metaData)
+
+	// upload metadata
+	req, err := http.NewRequest("POST", dbURLKey + imgPath, bytes.NewBuffer(strMetaData))
+	req.Header.Set("Content-Type", imgType)
+
+	resp, err := clientDB.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(resp)
+	resp.Body.Close()	
+}

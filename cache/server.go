@@ -5,6 +5,7 @@ import (
 	"hash"
 	"io"
 	"sync"
+	"log"
 
 	"github.com/pierrre/imageserver"
 )
@@ -41,6 +42,8 @@ func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println(im.Format)
+	log.Println(len(im.Data))
 	return im, nil
 }
 

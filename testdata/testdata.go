@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
+	"log"
 
 	"github.com/pierrre/imageserver"
 )
@@ -78,6 +79,9 @@ var (
 		if err != nil {
 			return nil, err
 		}
+		
+		log.Println("source: " + source)
+		
 		im, err := Get(source)
 		if err != nil {
 			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}

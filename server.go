@@ -1,6 +1,10 @@
 // Package imageserver provides an Image server toolkit.
 package imageserver
 
+import(
+	//"log"
+)
+
 // Server serves an Image.
 type Server interface {
 	Get(Params) (*Image, error)
@@ -16,6 +20,7 @@ func (f ServerFunc) Get(params Params) (*Image, error) {
 
 // SourceParam is the source Param name.
 const SourceParam = "source"
+const QueryKey = "url"
 
 // SourceServer is a Server implementation that forwards calls to the underlying Server with only the "source" param.
 //
@@ -50,6 +55,7 @@ type limitServer struct {
 }
 
 func (s *limitServer) Get(params Params) (*Image, error) {
+	//log.Printf("limited by %d\n", cap(s.limitCh))
 	s.limitCh <- struct{}{}
 	defer func() {
 		<-s.limitCh

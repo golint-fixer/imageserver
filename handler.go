@@ -1,5 +1,9 @@
 package imageserver
 
+import(
+	"log"
+)
+
 // Handler handles an Image and returns an Image.
 type Handler interface {
 	Handle(*Image, Params) (*Image, error)
@@ -21,11 +25,18 @@ type HandlerServer struct {
 
 // Get implements Server.
 func (srv *HandlerServer) Get(params Params) (*Image, error) {
+	log.Println("Image::start")
 	im, err := srv.Server.Get(params)
+	log.Println("Image::end")
+	
 	if err != nil {
 		return nil, err
 	}
+	
+	log.Println("Process::start")
 	im, err = srv.Handler.Handle(im, params)
+	log.Println("Process::end")
+	
 	if err != nil {
 		return nil, err
 	}
